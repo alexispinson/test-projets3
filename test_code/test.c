@@ -105,14 +105,31 @@ int main(int argc, char *argv[]){
 			definirPixel(image_surface,x,y,pixel);	
 		}
 	}
+	SDL_UnlockSurface(image_surface);
 	
 	//mise en place d'un filtre médian
+	/*int nb255 =0;
+	int nb0=0;
+	for (int x = 0;x<image_surface->w;x++){
+		for (int y = 0;y<image_surface->h;y++){
+			Uint32 pixel = obtenirPixel(image_surface,x,y);
+			SDL_GetRGBA(pixel,image_surface->format,&r,&v,&b,&a);
+			//faire tous les pixels en fonction de la place
+			
+			if(nb255>nb0){
+				pixel = SDL_MapRGBA(image_surface->format,255,255,255,a);
+			}
+			else if (nb0>nb255){
+				pixel = SDL_MapRGBA(image_surface->format,0,0,0,a);
+			}
+			definirPixel(image_surface,x,y,pixel);
+		}
+	}
+	*/
 	
 	
 	
 	
-	
-	SDL_UnlockSurface(image_surface);
 
 
 	//////////////////////////////////////////////
