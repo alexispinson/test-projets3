@@ -2,61 +2,13 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "utile.c"
 
-Uint32 obtenirPixel(SDL_Surface *surface, int x,int y){
-	int nbOctetsParPixel = surface->format->BytesPerPixel;
-	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * nbOctetsParPixel;
-	
-	switch(nbOctetsParPixel){
-		case 1 :
-			return *p;
-		case 2:
-			return *(Uint16 *)p;
-		case 3:
-			if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-				return p[0] << 16 | p[1] << 8 | p[2];
-			}
-			else{
-				return p[0] | p[1] << 8 | p[2] << 16;
-			}
-		case 4 :
-			return *(Uint32 *)p;
-			
-		default:
-			return 0;
-	}
-}
-
-void definirPixel(SDL_Surface *surface, int x,int y, Uint32 pixel){
-	int nbOctetsParPixel = surface->format->BytesPerPixel;
-	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * nbOctetsParPixel;
-	
-	switch(nbOctetsParPixel){
-		case 1:
-			*p = pixel;
-			break;
-		case 2 :
-			*(Uint16 *)p=pixel;
-		case 3:
-			if (SDL_BYTEORDER == SDL_BIG_ENDIAN){
-				p[0]=(pixel >> 16) & 0xff;
-				p[1]=(pixel >> 8) & 0xff;
-				p[2]=pixel & 0xff;
-			}
-			else{
-				p[2]=(pixel >> 16) & 0xff;
-				p[1]=(pixel >> 8) & 0xff;
-				p[0]=pixel & 0xff;
-			}
-		case 4:
-			*(Uint32 *)p = pixel;
-			break;
-	}
-}
-
-
+char image[] = "image1.jpeg";
 
 int main(int argc, char *argv[]){
+
+	//verif des importations
 	if(SDL_Init(SDL_INIT_VIDEO))
 	{
 		printf("probleme video");
@@ -71,14 +23,22 @@ int main(int argc, char *argv[]){
 		printf("Error creation de la fenetre");
 		return 2;
 	}
-	SDL_Renderer *renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 
+
+	SDL_Renderer *renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 	SDL_Surface *image_surface = NULL;
-	image_surface = IMG_Load("image1.jpeg"); //changer l'image ici
+	image_surface = IMG_Load(image); 
+
 	if(image_surface == NULL){
 		printf("peut pas trouver image");
 		SDL_Quit();
 	}
+
+	///pour l'original;
+	SDL_Surface *image_surface_origine = NULL;
+	image_surface_origine = IMG_Load(image);
+	SDL_Texture *image_texture_origine = SDL_CreateTextureFromSurface(renderer,image_surface_origine);
+	
 
 	//changement de la surface à mettre ici
 	//////////////////////////////////////////////
@@ -98,7 +58,11 @@ int main(int argc, char *argv[]){
 			else{
 				gris = 0;
 			}
+			
+			
 			pixel = SDL_MapRGBA(image_surface->format,gris,gris,gris,a);
+			
+
 			//
 			
 			
@@ -136,19 +100,10 @@ int main(int argc, char *argv[]){
 	SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer,image_surface);
 	SDL_FreeSurface(image_surface);
 
-	int quit = 0;
-	while(quit ==0){
-		SDL_Event windowEvent;
-		while(SDL_PollEvent(&windowEvent)){
-			if(windowEvent.type == SDL_QUIT){
-			quit = 1;
-			break;
-			}
-		}
-		SDL_Rect image_rect = {100,10,image_surface->w/2,image_surface->h/2}; //ici pour modifier l'affichage de l'image
-		SDL_RenderCopy(renderer,image_texture,NULL,&image_rect);
-		SDL_RenderPresent(renderer);
-	}
+
+	affichage(image_surface_origine,renderer,image_texture_origine,
+	image_surface,image_texture);
+
 
 	IMG_Quit();
 	SDL_Quit();
