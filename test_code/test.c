@@ -52,16 +52,13 @@ int main(int argc, char *argv[]){
 			//changement
 			Uint8 gris = (r+v+b)/3;
 			//permet de mettre soit en noir soit en blanc
-			if (2*gris>255){ 
+			if (2*gris>255){
 				gris = 255;
 			}
 			else{
 				gris = 0;
 			}
-			
-			
 			pixel = SDL_MapRGBA(image_surface->format,gris,gris,gris,a);
-			
 
 			//
 			
